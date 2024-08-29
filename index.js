@@ -1,47 +1,17 @@
 
-const express = require('express');
-const bodyParser = require("body-parser");
-const cors = require('cors');
-const axios = require('axios');
-const cheerio = require('cheerio');
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import axios from "axios";
+import * as cheerio from "cheerio";
+import passportStatus from "./controllers/passportStatus.js";
 
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 
-app.post("/api/passport-status", async (req, res) => {
-    const data = req.body;
-    const fileNo = data.fileNo;
-    const dob = data.applDob;
-
-    try {
-        const $ = await getPage(data);
-        const table = await getPassportStatus($);
-
-        if (table['File Number']) {
-            // Assuming statusText is still needed for some reason
-            const statusText = JSON.stringify(table);
-
-            // Respond with success and return table data (or statusText if needed)
-            res.send({
-                status: 'success',
-                data: table
-            });
-        } else {
-            res.status(400).send({
-                status: 'error',
-                message: 'Invalid inputs'
-            });
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'error',
-            message: 'Internal server error'
-        });
-    }
-})
+app.post("/api/passport-status", passportStatus)
 
 class RC {
     async getRcDetails(req, res) {
